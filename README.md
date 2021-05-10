@@ -1,6 +1,6 @@
 # java-jmx-policy
 
-Este proyecto permite observar diferentes accesos a los datos expuestos con el mecanismo llamado JMX.
+Este proyecto Java permite observar diferentes accesos a los datos expuestos con el mecanismo llamado [JMX](https://en.wikipedia.org/wiki/Java_Management_Extensions).
 
 ## Objetivo
 
@@ -12,7 +12,7 @@ Se debe contar con diferentes perfiles para acceder a la información provista p
 Se ejecuta un [Apache Tomcat/8.5.41](https://hub.docker.com/_/tomcat) con modificaciones en archivo `$CATALINA_HOME/conf/catalina.policy`.  
 Las modificaciones en archivo `catalina.policy` aplican al acceso de usuarios por medio de la clase `javax.management.remote.JMXPrincipal`.
 
-Existe un usuario administrador `admin` que tiene acceso a toda la información. Luego otros usuarios (monitorRole, controlRole) con acceso de lectura.
+Existe un usuario administrador `admin` que tiene acceso a toda la información. Luego otros usuarios (monitorRole, controlRole) con acceso restringido.
 
 La aplicación alojada en tomcat es **java-jmx-policy** (.war). Desarrollada con Java/Maven y compilada en Java8.
 
@@ -35,7 +35,7 @@ Otra opción para ocultar/denegar información de los objetos, es **quitar** el 
 Observar este comporatmiento navengando entre las páginas indicadas
 
 * http://localhost:8080/java-jmx-policy/ - Si docker-compose up -d
-* http://localhost:8080/java-jmx-policy/ - Si mvn tomcat7:run-war
+* http://localhost:8080/ - Si mvn tomcat7:run-war
 
 ## Run
 
