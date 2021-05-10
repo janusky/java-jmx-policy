@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context>
+	<!-- oracle.jdbc.xa.client.OracleXADataSource -->
+	<!-- Default set of monitored resources -->
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+	
+	<Resource 
+		name="jdbc/test_web" 
+		auth="Container" 
+		type="javax.sql.DataSource"
+		maxActive="100" 
+		maxIdle="30" 
+		maxWait="10000" 
+		driverClassName="org.postgresql.Driver"
+		url="jdbc:postgresql://IP_SERVER:5432/DB" 
+		username="user"
+		password="userpw" 
+		/>
+
+	<!-- 
+	<Resource 
+		name="jdbc/test_web" 
+		auth="Container" 
+		type="javax.sql.DataSource"
+		maxActive="100" 
+		maxIdle="30" 
+		maxWait="10000" 
+		driverClassName="oracle.jdbc.OracleDriver"
+		url="jdbc:oracle:thin:@IP_SERVER:1521:DB" 
+		username="user"
+		password="userpw"
+		/>
+	-->
+</Context>

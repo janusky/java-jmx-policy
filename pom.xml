@@ -1,0 +1,312 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>janusky</groupId>
+	<artifactId>java-jmx-policy</artifactId>
+	<packaging>war</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>java-jmx-policy</name>
+	<url>https://github.com/janusky</url>
+
+	<scm>
+		<connection>scm:git:git://git@github.com:janusky/java-jmx-policy.git</connection>
+		<developerConnection>scm:git:git://git@github.com:janusky/java-jmx-policy.git</developerConnection>
+		<url>https://github.com/janusky/java-jmx-policy</url>
+		<tag>HEAD</tag>
+	</scm>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+
+		<skipTests>true</skipTests>
+
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+
+		<!-- FIX Unknown error (Error del plugin M2Eclipse) -->
+		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
+	</properties>
+
+	<dependencies>
+		<!-- Servlet -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>javax.servlet.jsp-api</artifactId>
+			<version>2.3.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Connection -->
+		<!-- mvn install:install-file -Dfile=~/ojdbc8.jar -DgroupId=com.oracle -DartifactId=ojdbc8 -Dversion=12.2.0.1 -Dpackaging=jar
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc8</artifactId>
+			<version>12.2.0.1</version>
+		</dependency>-->
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.1-901-1.jdbc4</version>
+		</dependency>
+
+		<!-- Others -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.30</version>
+		</dependency>
+
+		<!-- TEST -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.5.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-runner</artifactId>
+			<version>1.5.2</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>java-jmx-policy</finalName>
+
+		<plugins>
+			<!-- mvn tomcat7:run-war -DskipTests http[s]://localhost:[8080|8443] o 
+				https://localhost.local:8443 -->
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<!-- http port -->
+					<port>8080</port>
+					<!-- application path always starts with / -->
+					<path>/</path>
+					<!-- optional path to a context file - tomcat/context.xml. -->
+					<contextFile>${project.basedir}/config/tomcat/context.xml</contextFile>
+					<httpsPort>8443</httpsPort>
+					<!--<hostName>localhost.local</hostName> -->
+					<keystoreFile>${project.build.directory}/tomcat7.keystore</keystoreFile>
+					<keystorePass>tomcat7</keystorePass>
+					<!-- optional system propoerties you want to add -->
+					<systemProperties>
+						<java_opts>-XX:MaxPermSize=1G -XX:PermSize=1G
+							-Dcom.sun.management.jmxremote
+							-Dcom.sun.management.jmxremote.port=9004
+							-Dcom.sun.management.jmxremote.authenticate=false
+							-Dcom.sun.management.jmxremote.ssl=false</java_opts>
+					</systemProperties>
+					<!-- if you want to use test dependencies rather than only runtime -->
+					<useTestClasspath>false</useTestClasspath>
+					<!-- optional if you want to add some extra directories into the classloader -->
+					<additionalClasspathDirs>
+						<additionalClasspathDir></additionalClasspathDir>
+					</additionalClasspathDirs>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>keytool-maven-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<phase>generate-resources</phase>
+						<id>clean</id>
+						<goals>
+							<!-- <goal>clean</goal> -->
+							<goal>generateKeyPair</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<keystore>${project.build.directory}/tomcat7.keystore</keystore>
+					<dname>cn=localhost, ou=None, L=None, ST=None, o=localhost, c=AR</dname>
+					<keypass>tomcat7</keypass>
+					<storepass>tomcat7</storepass>
+					<alias>local</alias>
+					<keyalg>RSA</keyalg>
+					<keysize>2048</keysize>
+					<validity>365</validity>
+					<verbose>true</verbose>
+					<skipIfExist>true</skipIfExist>
+				</configuration>
+			</plugin>
+
+			<!-- Empaquetador. Arma el .war Lo llama ${project.artifactId} que es 
+				el nombre del pom.xml, no aborta si no existe el archivo web.xml -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<warSourceDirectory>src/main/webapp</warSourceDirectory>
+					<warName>${project.artifactId}</warName>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+			</plugin>
+
+			<!-- mvn eclipse:eclipse -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.10</version>
+				<configuration>
+					<wtpversion>1.5</wtpversion>
+					<additionalProjectFacets>
+						<jst.java>${java.version}</jst.java>
+						<jst.web>3.0</jst.web>
+					</additionalProjectFacets>
+					<additionalBuildcommands>
+						<buildcommand>org.eclipse.wst.common.project.facet.core.builder</buildcommand>
+						<buildcommand>org.eclipse.wst.validation.validationbuilder</buildcommand>
+						<buildcommand>org.springframework.ide.eclipse.core.springbuilder</buildcommand>
+						<buildcommand>org.eclipse.m2e.core.maven2Builder</buildcommand>
+					</additionalBuildcommands>
+					<additionalProjectnatures>
+						<projectnature>org.eclipse.wst.common.project.facet.core.nature</projectnature>
+						<projectnature>org.eclipse.wst.common.modulecore.ModuleCoreNature</projectnature>
+						<projectnature>org.springframework.ide.eclipse.core.springnature</projectnature>
+						<projectnature>org.eclipse.m2e.core.maven2Nature</projectnature>
+					</additionalProjectnatures>
+					<downloadSources>false</downloadSources>
+					<useProjectReferences>true</useProjectReferences>
+				</configuration>
+			</plugin>
+		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>3.0.0-M1</version>
+					<configuration>
+						<tagNameFormat>v@{project.version}</tagNameFormat>
+						<arguments>-DskipTests</arguments>
+						<releaseProfiles>release</releaseProfiles>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>3.2.0</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<encoding>UTF-8</encoding>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+								<configuration>
+									<additionalparam>-Xdoclint:none</additionalparam>
+									<failOnError>false</failOnError>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+	<!-- ${user.home}/.m2/settings.xml -->
+	<repositories>
+		<repository>
+			<id>repo1</id>
+			<url>https://repo1.maven.org/maven2/</url>
+		</repository>
+        <repository>
+            <id>java-net-repo</id>
+            <url>https://maven.java.net/content/repositories/public/</url>
+        </repository>
+        <repository>
+            <id>jboss-repo</id>
+            <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>spring-repo</id>
+            <url>https://repo.spring.io/release</url>
+        </repository>
+		<repository>
+			<id>libs-snapshot</id>
+			<name>libs-snapshot</name>
+			<url>https://repo.spring.io/libs-snapshot</url>
+		</repository>
+		<repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+        </repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>repo1</id>
+			<url>https://repo1.maven.org/maven2/</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>release</id>
+			<name>release</name>
+			<url>https://repo.spring.io/release</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>snapshots</id>
+			<name>snapshot</name>
+			<url>https://repo.spring.io/snapshot</url>
+			<snapshots />
+		</pluginRepository>
+	</pluginRepositories>
+
+	<distributionManagement>
+		<repository>
+			<id>nexus.prod</id>
+			<url>https://nexus.server/nexus/repository/sandbox-maven/
+			</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus.prod</id>
+			<url>https://nexus.server/nexus/repository/sandbox-maven-snapshots/
+			</url>
+		</snapshotRepository>
+	</distributionManagement>
+</project>

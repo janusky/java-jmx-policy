@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Java Policy JMX</title>
+</head>
+<body>
+	<h2>Java Policy JMX - MBean!</h2>
+
+	<div style="width:910px;">
+		<p><a href="jmx.jsp">Listado de MBean registrados</a></p>
+		<p><a href="unregister.jsp">Quitar MBean DataSource</a></p>
+
+		<p>NOTA: Investigar si es posible modificar el archivo <strong>mbeans-descriptors.xml</strong>
+			para quitar la password del objeto MBean
+			<code>Catalina:class=javax.sql.DataSource,context=/,host=localhost,name="jdbc/test_web",type=DataSource</code>.
+		</p>
+		<p>
+			&lt;mbean name=&quot;jdbc/test_web&quot;<br>
+			&nbsp;description=&quot;DataSource obfuscated&quot; domain=&quot;Catalina&quot;&gt;<br>
+			&nbsp;&lt;attribute name=&quot;password&quot; description=&quot;The mask in pass&quot;<br>
+			&nbsp;type=&quot;java.lang.String&quot; writeable=&quot;false&quot; /&gt;<br>
+			&lt;/mbean&gt;
+		</p>
+	</div>
+</body>
+</html>

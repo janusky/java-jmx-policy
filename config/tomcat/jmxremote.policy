@@ -1,0 +1,28 @@
+
+// PERMISOS GENERALES PARA INGRESO JMX REMOTE
+grant {
+        // NOTA 1: Puede requerir otros permisos relacionados con la administración fuera de MBean
+        permission javax.management.MBeanPermission "sun.management.*#-[java.*:*]", "getMBeanInfo,isInstanceOf,queryNames";
+        permission javax.management.MBeanPermission "sun.management.*#*[java.*:*]", "getAttribute,invoke";
+        permission javax.management.MBeanPermission "sun.management.*#-[com.sun.management*:*]", "getMBeanInfo,isInstanceOf,queryNames";
+        permission javax.management.MBeanPermission "com.sun.management.*#-[java.*:*]", "getMBeanInfo,isInstanceOf,queryNames";
+        permission javax.management.MBeanPermission "com.sun.management.*#*[java.*:*]", "getAttribute,invoke";
+        permission javax.management.MBeanPermission "java.*#-[java.*:*]", "getMBeanInfo,isInstanceOf,queryNames";
+
+        // NOTA 2: Configuración ejemplo para administrar la information y acceso a los objetos MBean
+        permission javax.management.MBeanPermission "javax.management.MBeanServerDelegate#-[*:*]", "*";
+        permission javax.management.MBeanServerPermission "*";
+        permission javax.management.MBeanPermission "org.apache.catalina.*#*[*:*]", "*";
+        permission javax.management.MBeanPermission "org.apache.tomcat.util.modeler.*#-[*:*]", "*";
+        permission javax.management.MBeanPermission "org.apache.tomcat.util.modeler.*#*[Catalina:type=Server*]", "getAttribute";
+        permission javax.management.MBeanPermission "org.apache.tomcat.util.modeler.*#*[Catalina:type=Deployer,*]", "getAttribute";
+        permission javax.management.MBeanPermission "org.apache.tomcat.util.modeler.*#maxTotal[Catalina:type=DataSource,*]", "getAttribute";
+        permission javax.management.MBeanPermission "org.apache.tomcat.util.modeler.*#maxIdle[Catalina:type=DataSource,*]", "getAttribute";
+
+        permission java.lang.management.ManagementPermission "monitor";
+};
+
+// PERMISOS ESPECIALES PARA INGRESO JMX REMOTE
+grant principal javax.management.remote.JMXPrincipal "admin" {
+        permission javax.management.MBeanPermission "*", "*";
+};
